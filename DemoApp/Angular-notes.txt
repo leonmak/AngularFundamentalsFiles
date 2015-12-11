@@ -1,0 +1,30 @@
+Angular
+
+Controller -> Scope <-> View
+Ctrl's job is to create a scoped object to 2 way bind to view
+view can bind to model through the scope which exposes the model
+model is data put into the scope
+
+in .html
+  <div ng-controller="EventController">
+    {{event.name}}
+    <!-- From $scope.event = {name:...} -->
+  </div>
+
+to run the prg
+  ./server.sh
+
+ng-src for images
+
+ng-click to call functions
+  <div class="votingButton" ng-click="upVoteSession(session)">
+
+if using $scope, attach all obj to $scope
+  $scope.upVoteSession=function(session){
+    session.upVoteCount++;
+  }
+
+else if using IIFE method, wrap whole ctrl in IIFE
+  <div ng-controller="EventController as vm">
+  <div class="votingButton" ng-click="vm.upVoteSession(session)">
+  // w/o $scope need to refer to controller
