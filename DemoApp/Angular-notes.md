@@ -159,3 +159,39 @@ eventsApp.filter('durations',function(){
 
 ## ngModel directive
 sends user input (input, textarea, select) to scope
+```html
+  <style>input.ng-invalid.ng-dirty{background-color: pink}</style>
+  <form name ="newEventForm">
+  <!-- need <form name='..'>  to access .$invalid/.$valid -->
+  <fieldset>
+    <label for="eventName">Event Name:</label>
+    <input type="text" id="eventName" ng-model="event.name" placeholder="Name of event" required>
+    <!-- ng-model creates event object if not in the scope already -->
+    <label for="eventDate">Event Date:</label>
+    <input type="text" id="eventDate" ng-model="event.date" ng-pattern="/\d\d/\d\d/\d\d\d\d/" required placeholder="Date of event: mm/dd/yy">
+    <!-- ng-pattern uses regex -->
+    <!-- if required and 'touched', Angular marks form as ng-invalid and ng-dirty -->
+
+    <button type='submit' ng-disabled="newEventForm.$invalid" ng-click='saveEvent(event, newEventForm)' class="btn btn-primary">Save</button>
+```
+
+## Services
+Stateless client objects, like $scope.
+Whereas ctrl are for each view, services are for the entire app, like business logic.
+```js
+// in ctrl.js
+function EditProfileController($scope, GravatarUrlBuilder) {
+    $scope.getGravatarUrl = function(email) {
+        return GravatarUrlBuilder.buildGravatarUrl(email);
+
+// in service.js
+eventsApp.factory('GravatarUrlBuilder', function() {
+    return {
+        buildGravatarUrl: function(email) {
+
+```
+```html
+<div class="container-fluid" ng-controller="EditProfileController">
+<img ng-src="{{getGravatarUrl(user.emailAddress)}}" alt="f" />
+```
+* Remember to include the new service in the main .html file```
