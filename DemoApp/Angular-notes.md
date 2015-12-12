@@ -175,7 +175,7 @@ sends user input (input, textarea, select) to scope
     <button type='submit' ng-disabled="newEventForm.$invalid" ng-click='saveEvent(event, newEventForm)' class="btn btn-primary">Save</button>
 ```
 
-## Services
+## Service$
 Stateless client objects, like $scope.
 Whereas ctrl are for each view, services are for the entire app, like business logic.
 ```js
@@ -196,7 +196,7 @@ eventsApp.factory('GravatarUrlBuilder', function() {
 ```
 * Remember to include the new service in the main .html file
 
-## Using $http
+## Using $http w/ callback for client side getting json
 ```js
 // in EventCtrl
 var vm = this;
@@ -220,7 +220,7 @@ getEvents : function(callback){
 }
 ```
 
-### Simulating request from a db with local json files
+### Simulating request to server-side db with local json files
 the url above has id of 1
 
 ```js
@@ -247,4 +247,57 @@ module.exports.save = function(req, res) {
     res.send(event);
 }
 
+```
+
+## using http promises instead of callback
+put success error functions in ctrl instead of services
+```js
+// eventData.js
+getEvents : function(){
+  return $http({method:'GET', url:'data/event/1 '});
+}
+
+// eventCtrl.js
+eventData.getEvents()
+.success(function(data){
+  vm.event = data;
+})
+.error(function(data,status,headers,config){
+  $log.warn(data,status,headers(),config);
+});
+
+```
+
+## using $resource for ajax calls
+so we don't need to keep typing success and error.
+NOT a promise, so can't .then() Need $promise.then()
+```html
+<script src="/lib/angular/angular-resource.js"></script>
+```
+```js
+// eventCtrl.js, can directly bind to getEvents()
+vm.event = eventData.getEvents();
+
+// eventData.js
+eventsApp.factory('eventData',function($resource){
+  return {
+    getEvents : function(){
+      return $resource('data/event/:id', {id:'@id'}).get({id:1});
+}
+
+// app.js
+var eventsApp = angular.module('eventsApp', ['ngResource']);
+```
+
+## using $promise.then()
+```js
+eventData.getEvents()
+.$promise
+  .then(function(data){ vm.event= data; })              // .success
+  .catch(function(response){ console.log(response);}    // .error
+);  
+// .$promise.then(
+//   function(data){console.log(data);vm.event= data; }, // .success
+//   function(response){ console.log(response);}         // .error
+// )
 ```
