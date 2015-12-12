@@ -1,8 +1,12 @@
 eventsApp.factory('eventData',function($resource){
-  return { //services return object that will become the service
-    // instead of event : {.....}
+  var resource  = $resource('data/event/:id', {id:'@id'});
+  return {
     getEvents : function(){
-      return $resource('data/event/:id', {id:'@id'}).get({id:1});
+      return resource.get({id:1});
+    },
+    save: function(event){
+      event.id = 999;
+      return resource.save(event);
     }
   };
 });

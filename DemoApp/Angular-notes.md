@@ -249,7 +249,7 @@ module.exports.save = function(req, res) {
 
 ```
 
-## using http promises instead of callback
+## using http promises in client instead of callback
 put success error functions in ctrl instead of services
 ```js
 // eventData.js
@@ -268,7 +268,7 @@ eventData.getEvents()
 
 ```
 
-## using $resource for ajax calls
+## using $resource in client for ajax calls
 so we don't need to keep typing success and error.
 NOT a promise, so can't .then() Need $promise.then()
 ```html
@@ -301,3 +301,28 @@ eventData.getEvents()
 //   function(response){ console.log(response);}         // .error
 // )
 ```
+
+## Saving data to json file with $resource
+```js
+// ctrl.js
+eventsApp.controller('EditEventController',
+function EditEventController($scope,eventData){
+  $scope.saveEvent = function(event, newEventForm){
+    if(newEventForm.$valid){
+      eventData.save(event)
+      .$promise
+      .then(function(res){console.log("success",res);})
+      .catch(function(res){console.log("fail",res);})
+    };
+  };
+
+// eventData service
+eventsApp.factory('eventData',function($resource){
+  var resource  = $resource('data/event/:id', {id:'@id'});
+  return {
+save: function(event){
+  event.id = 999;
+  return resource.save(event);
+}
+```
+server-side same

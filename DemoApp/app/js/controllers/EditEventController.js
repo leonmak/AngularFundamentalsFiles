@@ -1,15 +1,19 @@
 'use strict';
 
-angular.module('eventsApp').controller('EditEventController',function EditEventController($scope){
+eventsApp.controller('EditEventController',
+function EditEventController($scope,eventData){
 
   $scope.saveEvent = function(event, newEventForm){
-    if(newEventForm.$valid){ // use <form name>.$valid to see if validations pass
-      window.alert(event.name, 'Valid');
-    }
+    if(newEventForm.$valid){
+      eventData.save(event)
+      .$promise
+      .then(function(res){console.log("success",res);})
+      .catch(function(res){console.log("fail",res);})
+    };
   };
 
   $scope.cancelEvent = function() {
-    window.location = 'f.html/';
+    window.location = '/EventDetails.html';
   };
 
 });

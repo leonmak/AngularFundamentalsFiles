@@ -10,4 +10,4 @@ module.exports.save = function(req, res) {
     var event = req.body;
     fs.writeFileSync('app/data/event/' + req.params.id + '.json', JSON.stringify(event));
     res.send(event);
-}
+};
