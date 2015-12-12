@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="/css/app.css">
 
 </head>
-<body>
+<body ng-cloak>
 
   <div class="container">
 
@@ -20,6 +20,14 @@
 
     <div ng-controller="EventController as vm">
       <img ng-src="{{vm.event.imageUrl}}" alt="{{vm.event.name}}">
+      <div ng-bind="htmlbindsnippet">Change to bound variable</div>
+      <div ng-hide="bool">hide</div>
+      <div ng-show="bool">Show</div>
+      <div ng-class="bclass">Blue</div>
+      <div ng-style="bstyle">Blue</div>
+      <button class="btn" ng-disabled="true">Btn</button>
+      <div ng-non-bindable>{{ 1+2}}</div>
+
       <div class="row">
         <div class="span11">
           <h2>{{vm.event.name | uppercase}} </h2>
@@ -29,7 +37,7 @@
       <!-- vm.event info -->
       <div class="row">
         <div class="span3">
-          <div><strong>Date:</strong> {{vm.event.date}}</div>
+          <div><strong>Date:</strong> {{vm.event.date | date:'MM/dd/yyyy'}}</div>
           <!-- From $scope.vm.event = {name:...} -->
           <div><strong>Time:</strong> {{vm.event.time}}</div>
           <div><strong>Price:</strong> {{34 | currency}}</div>
@@ -45,8 +53,22 @@
 
       <!-- ng-repeat -->
       <h3>Sessions</h3>
+      Order By:
+      <select ng-model="sortorder" class="input-medium">
+        <option value="name" >Name</option>
+        <option value="-name" >Name Desc</option>
+        <option value="-upVoteCount">Votes</option>
+      </select>
+
+      <select ng-model="query.level">
+        <option value="">All</option>
+        <option value="Introductory">Introductory</option>
+        <option value="Intermediate">Intermediate</option>
+        <option value="Advanced">Advanced</option>
+      </select>
+
       <ul class="thumbnails">
-        <li ng-repeat="session in vm.event.sessions">
+        <li ng-repeat="session in vm.event.sessions | orderBy: sortorder | filter:query">
           <div class="row session">
 
             <!-- voting widget -->
@@ -65,7 +87,7 @@
             <div class="well span9">
               <h4 class="well-title">{{session.name}}</h4>
               <h6 style="margin-top:-10px">{{session.creatorName}}</h6>
-              <span>Duration: {{session.duration}}</span><br />
+              <span>Duration: {{session.duration | durations }}</span><br />
               <span>Level: {{session.level}}</span>
               <p>{{session.abstract}}</p>
             </div>
@@ -88,3 +110,4 @@
 
 </body>
 </html>
+ 

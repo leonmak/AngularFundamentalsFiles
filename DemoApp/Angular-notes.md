@@ -1,0 +1,161 @@
+## Controller -> Scope <-> View
+Ctrl's job is to create a scoped object to 2 way bind to view
+view can bind to model through the scope which exposes the model
+model is data put into the scope
+
+```html
+  <div ng-controller="EventController">
+    {{event.name}}
+    <!-- From $scope.event = {name:...} -->
+  </div>
+```
+
+to run the prg
+```    
+./server.sh
+```
+
+#### ng-src for images
+```html
+<img ng-src="{{vm.event.imageUrl}}" alt="{{vm.event.name}}">
+```
+
+#### ng-click to call functions
+```html
+  <div class="votingButton" ng-click="upVoteSession(session)">
+```
+
+#### if using $scope, attach all obj to $scope
+```js
+'use strict';
+
+eventsApp.controller('EventController',
+  function EventController($scope) {
+    $scope.sortorder = 'name';
+```
+```html
+<div ng-controller="EventController" style="padding-left:20px">
+  <img ng-src="{{event.imageUrl}}" alt="{{event.name}}">
+```
+
+#### else if using IIFE method, wrap whole ctrl in IIFE
+``` js
+(function () {
+  'use strict';
+  angular.module('eventsApp').controller('EventController',[EventController]);
+
+  function EventController(){
+    var vm = this;
+    vm.sortorder = 'name';
+```
+
+```html
+  <div ng-controller="EventController as vm">
+  <div class="votingButton" ng-click="vm.upVoteSession(session)">
+  // w/o $scope need to refer to controller
+
+```
+Directives allow DOM manipulation and ways to extend HTML
+like Tags, Attributes, Classes, transforming HTML into a DSL
+
+
+#### ngBind
+Replaces anything between tags with bound value
+```html
+<div ng-bind="bindsnippet">Change to bound variable</div>
+```
+```js
+$scope.bindsnippet = 'HI THERE';
+```
+
+#### ngHide ngShow
+```html
+<div ng-hide="bool">hide</div>
+<div ng-show="bool">Show</div>
+```
+```js
+$scope.bool = true;
+```
+
+#### ngCloak
+hides angular {{ }} until all loads
+```css
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+```
+```html
+<body ng-cloak>
+```
+
+#### ngClass and style
+```js
+$scope.bstyle = {color:'blue'};
+$scope.bclass = 'blue';
+```
+```html
+<div ng-class="bclass">Blue</div>
+<div ng-style="bstyle">Blue</div>
+```
+#### ngDisabled
+```html
+<button class="btn" ng-disabled="true">Btn</button>
+```
+#### ngNonBindable
+```html
+<div ng-non-bindable>{{1+2}}</div>
+```
+
+*for IE, polyfill Json and no ng-tags*
+
+*expressions can take arrays*
+### Filters
+```html
+<select ng-model="sortorder" class="input-small">
+  <option selected value="name" >Name</option>
+  <option value="-upVoteCount">Votes</option>
+  <option value="-name" >Name Desc</option>
+</select>
+<select ng-model="query.level">
+  <option value="">All</option>
+  <option value="Introductory">Introductory</option>
+  <option value="Intermediate">Intermediate</option>
+  <option value="Advanced">Advanced</option>
+</select>
+<ul class="thumbnails">
+  <li ng-repeat="session in vm.event.sessions | orderBy: sortorder | filter:query">
+```
+orderBy takes a string, sortorder is $scope.sortorder,
+ng-model can change $scope.sortorder
+```js
+$scope.sortorder = '-name';
+//default value will be -name, and option set to 'Name Desc'
+```
+__filter Filter__ : passes query arg (each session in sessions array) to ng-model
+Then ng-model see if query.level is subset of option.value. if "" means all true
+
+#### Custom Filters w/ .filter()
+```js
+// .filter(<name-of-filter>,function(){
+//    return function(<input>){
+//  return <o/p>}})
+eventsApp.filter('durations',function(){
+  return function(durationIndex){
+    switch(durationIndex){
+      case 1: return 'Half Hour';
+      case 2: return '1 Hour';
+      case 3: return '2 Hours';
+      case 4: return 'Half Day'
+    }
+  }
+})
+```
+```html
+<!-- can use in expression -->
+<span>Duration: {{session.duration | durations }}</span><br />
+<!-- include -->
+<script src="/js/filters.js"></script>
+```
+
+## ngModel directive
+sends user input (input, textarea, select) to scope

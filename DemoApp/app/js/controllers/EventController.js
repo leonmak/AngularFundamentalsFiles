@@ -2,14 +2,21 @@
 
   'use strict';
 
-  angular.module('eventsApp').controller('EventController',[EventController]);
+  angular.module('eventsApp').controller('EventController',['$scope',EventController]);
 
-  function EventController(){
+  function EventController($scope){
+
+    $scope.bindsnippet = 'Bind this';
+$scope.bool = true;
+$scope.bstyle = {color:'blue'};
+$scope.bclass = 'blue';
+$scope.sortorder = '-name';
+
     var vm = this;
-    vm.sortorder = 'name';
+
     vm.event = {
       name: 'Angular Boot Camp',
-      date: '1/1/2013',
+      date: '1288323623006',
       time: '10:30 am',
       location: {
         address: 'Google Headquarters',
@@ -38,7 +45,7 @@
           name: 'Well Behaved Controllers',
           creatorName: 'Jane Doe',
           duration: 4,
-          level: 'Intermediate',
+          level: 'Intermediate Introductory',
           abstract: 'Controllers are the beginning of everything Angular does. Learn how to craft controllers that will win the respect of your friends and neighbors',
           upVoteCount: 0
         }
