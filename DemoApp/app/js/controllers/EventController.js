@@ -2,9 +2,9 @@
 
   'use strict';
 
-  angular.module('eventsApp').controller('EventController',['EventData','$scope',EventController]);
+  angular.module('eventsApp').controller('EventController',['eventData','$scope',EventController]);
 
-  function EventController(EventData, $scope){
+  function EventController(eventData, $scope){
 
     $scope.bindsnippet = 'Bind this';
     $scope.bool = true;
@@ -13,8 +13,10 @@
     $scope.sortorder = '-name';
 
     var vm = this;
-    vm.event = EventData.event;
-
+    // instead of vm.event = eventData.event;
+    eventData.getEvents(function(eventObjData){
+      vm.event = eventObjData;
+    })
     vm.upVoteSession=function(session){
       session.upVoteCount++;
     }

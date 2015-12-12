@@ -184,7 +184,7 @@ function EditProfileController($scope, GravatarUrlBuilder) {
     $scope.getGravatarUrl = function(email) {
         return GravatarUrlBuilder.buildGravatarUrl(email);
 
-// in service.js
+// in service.js, abstract the buildGravatarUrl
 eventsApp.factory('GravatarUrlBuilder', function() {
     return {
         buildGravatarUrl: function(email) {
@@ -194,4 +194,57 @@ eventsApp.factory('GravatarUrlBuilder', function() {
 <div class="container-fluid" ng-controller="EditProfileController">
 <img ng-src="{{getGravatarUrl(user.emailAddress)}}" alt="f" />
 ```
-* Remember to include the new service in the main .html file```
+* Remember to include the new service in the main .html file
+
+## Using $http
+```js
+// in EventCtrl
+var vm = this;
+// instead of vm.event = eventData.event;
+// Passes a callback fn to service, which runs after .success gets data
+eventData.getEvents(function(eventObjData){
+  vm.event = eventObjData;
+})
+
+// in eventData Service
+// instead of returning
+// event : {.....}
+getEvents : function(callback){
+  $http({method:'GET', url:'data/event/1 '})
+  .success(function(data,status,headers,config){
+    callback(data);
+  })
+  .error(function(data,status,headers,config){
+    $log.warn(data,status,headers(),config);
+  });
+}
+```
+
+### Simulating request from a db with local json files
+the url above has id of 1
+
+```js
+// scripts/web-server.js
+var events = require('./eventsController');
+var bodyParser = require('body-parser');
+
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
+
+app.get('/data/event/:id', events.get); //when method:'GET'
+app.post('/data/event/:id', events.save);
+
+// scripts/eventsController.js, exports get and save
+var fs = require('fs');
+module.exports.get = function(req, res) {
+    var event = fs.readFileSync('app/data/event/' + req.params.id + '.json', 'utf8');
+    res.setHeader('Content-Type', 'application/json');
+    res.send(event); // send back data which success executes
+};
+module.exports.save = function(req, res) {
+    var event = req.body;
+    fs.writeFileSync('app/data/event/' + req.params.id + '.json', JSON.stringify(event));
+    res.send(event);
+}
+
+```
