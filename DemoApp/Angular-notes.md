@@ -326,3 +326,14 @@ save: function(event){
 }
 ```
 server-side same
+
+
+## $anchorScroll
+```html
+<button class="button button-primary" ng-click="scrollToSession()">scroll</button>
+```
+```js
+$scope.scrollToSession = function(){
+  $anchorScroll();
+}
+```

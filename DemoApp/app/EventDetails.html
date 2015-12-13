@@ -69,10 +69,11 @@
         <option value="Advanced">Advanced</option>
       </select>
 
-      <ul class="thumbnails">
-        <li ng-repeat="session in vm.event.sessions | orderBy: sortorder | filter:query">
-          <div class="row session">
+      <button class="button button-primary" ng-click="scrollToSession()">scroll</button>
 
+      <ul class="thumbnails">
+        <li ng-repeat="session in vm.event.sessions | orderBy: sortorder | filter:query" id=session{{session.id}}>
+          <div class="row session">
             <!-- voting widget -->
             <div class="span0 well votingWidget">
               <div class="votingButton" ng-click="vm.upVoteSession(session)">
