@@ -10,6 +10,7 @@ app.use(bodyParser.json());
 app.use(express.static(rootPath + '/app'));
 // serve the files in app w/o processing them
 
+app.get('/data/event', events.getAll);
 app.get('/data/event/:id', events.get);
 app.post('/data/event/:id', events.save);
 

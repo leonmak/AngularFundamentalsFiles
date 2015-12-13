@@ -156,6 +156,7 @@ eventsApp.filter('durations',function(){
 <!-- include -->
 <script src="/js/filters.js"></script>
 ```
+Custom filters eg: durations can be injected into controllers as durationsFilter
 
 ## ngModel directive
 sends user input (input, textarea, select) to scope
@@ -336,4 +337,76 @@ server-side same
 $scope.scrollToSession = function(){
   $anchorScroll();
 }
+```
+
+Other $services, $parse, $compile, $locale, $timeout, $exceptionHandler(override)
+
+# Templates
+Just html, views are final product, html+model
+cut the content portion out into a template, and replace w/ ng-view tag
+so index.html is left with navbar, head, and footer w/ scripts
+
+## routing
+in app.js,
+```js
+var eventsApp = angular.module('eventsApp', ['ngResource', 'ngRoute']);
+eventsApp.config(function($routeProvider){
+  $routeProvider.when('/newEvent',        // when /#/newEvent
+  {
+    templateUrl:'template/NewEvent.html', // load file
+    controller: 'EditEventController'
+  })
+});
+```
+```html
+<li><a href="#/newEvent">Create Event</a></li>
+<script src="/lib/angular/angular-route.js"></script>
+```
+
+## access url id w/ $routeParams
+event link from EventList.html
+```html
+<a href="#/event/{{event.id}}">
+```
+
+```js
+// in app.js routes
+$routeProvider.when('/event/:eventId',
+{
+  templateUrl: 'templates/EventDetails.html',
+  controller: 'EventController as vm'
+});
+$routeProvider.otherwise({
+  redirectTo: '/events'
+});
+
+// in EventController.js
+angular.module('eventsApp').controller('EventController',['eventData','$routeParams',EventController]);
+function EventController(eventData, $routeParams){
+  eventData.getEvent($routeParams.eventId)
+  .$promise
+  .then(function(data){ vm.event= data; console.log(vm.event);})
+  .catch(function(response){ console.log(response);}
+);
+
+// in EventData.js factory, gets json based on url id
+var resource  = $resource('data/event/:id', {id:'@id'});
+return {
+getEvent : function(eventId){
+  return resource.get({id:eventId});
+}
+
+getAllEvents: function(){
+  return resource.query(); // QUERY sends get request without :id
+}
+
+// server side, web-server.js
+app.get('/data/event', events.getAll);
+
+// eventsController
+module.exports.getAll = function(req, res) {
+    var path = 'app/data/event/';
+    var files = [];
+    // ... GETS ALL EVENTS AS ARRAY .. //
+
 ```
