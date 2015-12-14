@@ -410,3 +410,159 @@ module.exports.getAll = function(req, res) {
     // ... GETS ALL EVENTS AS ARRAY .. //
 
 ```
+
+$route service can access url queries <param>?foo=bar
+
+
+### Remove need for `#` in url
+```html
+<base href="/">
+
+```
+```js
+//app.js
+  eventsApp.config(function($routeProvider, $locationProvider){
+  //...
+  $locationProvider.html5Mode(true);
+  }
+
+// server-side, web-server.js
+app.get('*', function(req,res){ res.sendFile(rootPath + '/app/index.html');});
+
+```
+* Remember to remove # in links w/ "#/events"
+
+
+## resolve url for slow loading sites
+```js
+// app.js
+$routeProvider.when('/event/:eventId',
+    {
+        templateUrl: 'templates/EventDetails.html',
+        controller: 'EventController',
+        resolve: {
+            event: function($route, eventData) {
+                return eventData.getEvent($route.current.pathParams.eventId).$promise;
+            }
+        }
+    });
+
+// EventController
+$scope.event = $route.current.locals.event
+```
+Waits until ajax call finishes then displays, if it's minor just use ng-cloak
+
+
+## $location
+altv to routing, using ng-click(createEvent()) instead of href='/route'
+```html
+<div class="navbar" ng-controller="MainMenuController">
+      <li><a href="#" ng-click="createEvent()">Create Event</a></li>
+```
+```js
+// ctrl.js
+eventsApp.controller('MainMenuController',
+    function MainMenuController($scope, $location) {
+        console.log('absUrl:', $location.absUrl());
+        console.log('protocol:', $location.protocol());
+        console.log('port:', $location.port());
+        console.log('host:', $location.host());
+        console.log('path:', $location.path());
+        console.log('search:', $location.search());
+        console.log('hash:', $location.hash());
+        console.log('url:', $location.url());
+        $scope.createEvent = function() {
+            $location.replace();
+            $location.url('/newEvent');
+        }
+    })
+```
+
+
+# Directives
+Can be element, class, attribute
+
+<appName>.directive('<dirName>',
+  function(<dep/svc>){ return
+    restrict: // default is a - attr, can be e,
+
+    template: // Angular compiles for you.
+//  is shortform for link:function(scope,el){
+//  angular.element(element).html($compile("<div>Markup</div>")(scope))}
+
+    replace: true
+    link:
+    controller:
+
+    require:
+
+    priority:
+    terminal:
+})
+
+Sample Directive
+```html
+<div class="my-sample" />
+
+```
+```js
+eventsApp.directive('mySample', function($compile) {
+    return {
+        restrict: 'C', // for class
+        template: "<input type='text' ng-model='sampleData' /> {{sampleData}}<br/>"
+    };
+});
+```
+Element as template expanding, eg. for each event panel
+Similar to how routes can allow you to 'cutout' parts of html,
+Directives are like sub-templates, allowing you cutout parts of the template.
+```html
+// templates/eventList.html
+<li ng-repeat="event in events|orderBy:sortorder" class="span5">
+    <!-- put into directive eventThumbnail.html  -->
+    <event-thumbnail />
+</li>
+
+// templates/directives/eventThumbnail.html
+<a href="event/{{event.id}}">
+//...
+</a>
+
+// index.html
+<script src="/js/directives/eventThumbnail.js"></script>
+```
+```js
+eventsApp.directive('eventsThumbnail', function(){
+// Angular transforms camelCase to normal-case
+  return {
+    restrict: "E",
+    replace: true, // so <event-thumbnail> doesn't show in resultant html
+    templateUrl : '/templates/directives/eventThumbnail.html'
+  }
+})
+```
+
+El as responding to changes using:
+* attrs.$observe('<attr>',function(new,old){}),
+* attrs.$set('<attr>',<fn()>);
+
+Attribute for adding function, eg. for restricting date input to numbers
+Can bind to keydown event and cancel invalid keystrokes
+
+Link runs after directive is compiled and linked up
+link: function(e) {elemt.on('keydown',function(event){ ... return false}) }
+
+Attr using Element's controller:
+Use require property of directive
+
+Sharing controllers with nested directive
+Need to use require: ^<parent Directive> // ^ traverses upwards
+<greeting>
+  <div hindi finnish>
+</greeting>
+
+Transclusion, keep the html within directive
+
+Manipuate DOM with compile property, advanced, eg. ng-repeat uses it internally
+
+Making Jquery plugins more explicit

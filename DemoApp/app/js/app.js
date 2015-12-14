@@ -2,7 +2,7 @@
 
 var eventsApp = angular.module('eventsApp', ['ngResource', 'ngRoute']);
 
-eventsApp.config(function($routeProvider){
+eventsApp.config(function($routeProvider, $locationProvider){
   $routeProvider.when('/newEvent',
   {
     templateUrl:'templates/NewEvent.html',
@@ -21,6 +21,7 @@ eventsApp.config(function($routeProvider){
   $routeProvider.otherwise({
     redirectTo: '/events'
   });
+  $locationProvider.html5Mode(true);
 });
 
 

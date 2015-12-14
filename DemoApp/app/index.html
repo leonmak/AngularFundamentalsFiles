@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="eventsApp">
 <head>
+  <base href="/">
   <title>Event Schedule</title>
   <link rel="stylesheet" href="/css/bootstrap.min.css">
   <link rel="stylesheet" href="/css/app.css">
@@ -13,7 +14,7 @@
     <div class="navbar">
       <div class="navbar-inner">
         <ul class="nav">
-          <li><a href="#/newEvent">Create Event</a></li>
+          <li><a href="newEvent">Create Event</a></li>
         </ul>
       </div>
     </div>
@@ -35,6 +36,8 @@
     <script src="/js/controllers/EditEventController.js"></script>
     <script src="/js/controllers/EventListController.js"></script>
     <script src="/js/controllers/EventController.js"></script>
+
+    <script src="/js/directives/eventThumbnail.js"></script>
 
     <script src="/js/services/EventData.js"></script>
     <script src="/js/services/GravatarUrlBuilder.js"></script>
