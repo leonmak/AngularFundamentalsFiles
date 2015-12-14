@@ -1,11 +1,11 @@
 'use strict';
 
 eventsApp.controller('EditProfileController',
-    function EditProfileController($scope, GravatarUrlBuilder) {
+    function EditProfileController($scope, gravatarUrlBuilder) {
         $scope.user = {};
 
         $scope.getGravatarUrl = function(email) {
-            return GravatarUrlBuilder.buildGravatarUrl(email);
+            return gravatarUrlBuilder.buildGravatarUrl(email);
         }
 
     }

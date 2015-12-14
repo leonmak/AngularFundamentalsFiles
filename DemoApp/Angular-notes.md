@@ -500,7 +500,7 @@ Can be element, class, attribute
     terminal:
 })
 
-Sample Directive
+### Sample Directive
 ```html
 <div class="my-sample" />
 
@@ -513,7 +513,7 @@ eventsApp.directive('mySample', function($compile) {
     };
 });
 ```
-Element as template expanding, eg. for each event panel
+### Element as template expanding, eg. for each event panel
 Similar to how routes can allow you to 'cutout' parts of html,
 Directives are like sub-templates, allowing you cutout parts of the template.
 ```html
@@ -542,26 +542,184 @@ eventsApp.directive('eventsThumbnail', function(){
 })
 ```
 
-El as responding to changes using:
-* attrs.$observe('<attr>',function(new,old){}),
-* attrs.$set('<attr>',<fn()>);
+### Passing data in attr to Isolate scope of directives
+```html
+<li ng-repeat="eventItem in events" class="span5">
+<event-thumbnail event="eventItem" />
+```
+```js
+scope: { // isolate scope of eventThumbnail
+    event: "=" // event: "=event" // "=event" is attr
+}
+```
+Other types of bindings:
+* upvote :"&" -function
+* votes  :"@" -string
 
-Attribute for adding function, eg. for restricting date input to numbers
-Can bind to keydown event and cancel invalid keystrokes
+```js
+eventsApp.directive('upvote', function() {
+    return {
+        restrict: 'E',
+        replace: true,
+        templateUrl: '/templates/directives/upvote.html',
+        scope: {
+            upvote: "&",
+            downvote: "&",
+            count: "@" // if "=" , count="session.upVoteCount" in eventDetails.html
+        }
+    }
+});
+```
+```html
+/* template/directives/upvote.html */
+<div class="span0 well votingWidget">
+    <div class="votingButton" ng-click="upvote()">
+  // upvote(): call method in scope which will call method in parent scope
+        <i class="icon-chevron-up icon-white"></i>
+    </div>
+    <div class="badge badge-inverse">
+        <div>{{count}}</div>
+    </div>
+    <div class="votingButton" ng-click="downvote()">
+        <i class="icon-chevron-down"></i>
+    </div>
+</div>
 
-Link runs after directive is compiled and linked up
+/* templates/eventDetails.html */
+<li ng-repeat="session in vm.event.sessions">
+  <div class="row session">
+    <!-- voting widget cut into directive -->
+    <!-- <div class="span0 well votingWidget">
+      <div class="votingButton" ng-click="vm.upVoteSession(session)">
+        <i class="icon-chevron-up icon-white"></i>
+      </div>
+      <div class="badge badge-inverse">
+        <div>{{session.upVoteCount}}</div>
+      </div>
+      <div class="votingButton" ng-click="vm.downVoteSession(session)">
+        <i class="icon-chevron-down"></i>
+      </div>
+    </div> -->
+<upvote upvote="vm.upVoteSession(session)" downvote="vm.downVoteSession(session)" count="{{session.upVoteCount}}"/>
+/* session is mentioned only in this line, not in child directives anymore, so can reuse*/
+```
+
+### Link runs after directive is compiled and linked up
 link: function(e) {elemt.on('keydown',function(event){ ... return false}) }
 
-Attr using Element's controller:
-Use require property of directive
+### Event handling with link,
+restrict letters for date, bind to keydown event
+```js
+// dateKeys.js
+link: function($scope, element, attrs, controller) {
+    element.on('keydown', function(event) {
+        if (isNumericKeyCode(event.keyCode) || isForwardSlashKeyCode(event.keyCode) || isNavigationKeycode(event.keyCode)) {
+            return true;
+        }
+        return false; // False cancels input
+// ... refer to isNumericKeyCode functions //
+```
 
-Sharing controllers with nested directive
-Need to use require: ^<parent Directive> // ^ traverses upwards
+### El as responding to changes for gravatar:
+* attrs.$observe('<attr>',function(new,old){}),
+* attrs.$set('<attr>',<fn()>);
+```js
+eventsApp.directive('gravatar', function(gravatarUrlBuilder) { // inject service
+template: '<img />',
+replace: true,
+link: function(scope, element, attrs, controller) {
+    attrs.$observe('email', function(newValue, oldValue) {
+        if(newValue !== oldValue) {
+            attrs.$set('src', gravatarUrlBuilder.buildGravatarUrl(newValue));
+        }
+    });
+```
+```html
+<gravatar email="{{user.emailAddress}}"/>
+<!-- <img src = "<result from passing in scope's email address to gravatar>"> -->
+
+<script src="/js/directives/gravatar.js"></script>
+```
+
+###  Attr directive using Element directive's controller:
+Use require property of directive
+```js
+eventsApp
+    .directive('greeting', function() {
+        return {
+            restrict: 'E',
+            replace: true,
+            template: "<button class='btn' ng-click='sayHello()'>Say Hello</button>",
+            controller: function GreetingController($scope) {
+                var greetings = ['hello'];
+                $scope.sayHello = function() {
+                    alert(greetings.join());
+                }
+                this.addGreeting = function(greeting) {
+                    greetings.push(greeting);
+                }
+            }
+        };
+    })
+    .directive('finnish', function() {
+        return {
+            restrict: 'A',
+            require: 'greeting',
+            link: function(scope, element, attrs, controller) {
+                controller.addGreeting('hei'); // Attr use function from Element's ctrl
+            }
+        }
+    })
+
+
+```
+
+Run attributes Order
+ priority: -1,
+ terminal: true,
+
+## Sharing controllers with nested directive
+```js
+require: '^greeting', // ^ traverses upwards
+link: function(scope, element, attrs, controller) {
+    controller.addGreeting('hei');
+}
+
+```
+```html
 <greeting>
   <div hindi finnish>
 </greeting>
 
+```
+```js
 Transclusion, keep the html within directive
+eventsApp.directive('collapsible', function() {
+    return {
+        restrict: 'E',
+        replace: true,
+        template: '<div><h4 class="well-title" ng-click="toggleVisibility()">{{title}}</h4><div ng-show="visible" ng-transclude></div></div>',
+// ng-transcule for items in between collapsible tags
+        controller: function($scope) {
+            $scope.visible = true;
+
+            $scope.toggleVisibility = function() {
+                $scope.visible = !$scope.visible;
+            }
+        },
+        transclude: true,
+        scope: {
+            title: '@'
+        }
+```
+```html
+<collapsible title="{{session.name}}">
+    <h6 style="margin-top:-10px">{{session.creatorName}}</h6>
+    <span>Duration: {{session.duration | durations}}</span><br />
+    <span>Level: {{session.level}}</span>
+    <p>{{session.abstract}}</p>
+</collapsible>
+```
 
 Manipuate DOM with compile property, advanced, eg. ng-repeat uses it internally
 

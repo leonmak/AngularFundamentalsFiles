@@ -3,9 +3,9 @@
     <hr/>
     <hr/>
     <ul class="thumbnails">
-        <li ng-repeat="event in events|orderBy:sortorder" class="span5">
+        <li ng-repeat="eventI in events|orderBy:sortorder" class="span5">
             <!-- put thumbnail html into directive -->
-      <event-thumbnail />
+      <event-thumbnail event="eventI"/>
         </li>
     </ul>
 </div>
