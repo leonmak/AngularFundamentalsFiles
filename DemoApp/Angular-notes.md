@@ -724,3 +724,21 @@ eventsApp.directive('collapsible', function() {
 Manipuate DOM with compile property, advanced, eg. ng-repeat uses it internally
 
 Making Jquery plugins more explicit
+```html
+// index.html
+<link rel="stylesheet" href="/lib/jquery-ui-1.11.4.custom/jquery-ui.css">
+<script src="/lib/jquery.min.js"></script>
+
+// newEvent.html
+<input type="text" id="eventDate" date-keys date-picker ng-model="event.date" ng-pattern="/\d\d/\d\d/\d\d\d\d/" required placeholder="Date of event: mm/dd/yy">
+```
+```js
+eventsApp.directive('datePicker', function() {
+  return {
+    restrict: 'A',
+    link: function(scope, element){
+      element.datePicker();
+    }
+  }
+})
+```

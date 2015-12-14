@@ -1,5 +1,5 @@
 <!-- Replaced Content here -->
-<style>input.ng-invalid.ng-dirty{background-color: pink}</style>
+<!-- <style>input.ng-invalid.ng-dirty{background-color: pink}</style> -->
 <div>
   <div class="container">
     <h1>New Event Form</h1>
@@ -10,7 +10,7 @@
         <input type="text" id="eventName" ng-model="event.name" placeholder="Name of event" required>
         <!-- ng-model creates event object if not in the scope already -->
         <label for="eventDate">Event Date:</label>
-        <input type="text" id="eventDate" date-keys ng-model="event.date" ng-pattern="/\d\d/\d\d/\d\d\d\d/" required placeholder="Date of event: mm/dd/yy">
+        <input type="text" id="eventDate" date-keys date-picker ng-model="event.date" ng-pattern="/\d\d/\d\d/\d\d\d\d/" required placeholder="Date of event: mm/dd/yy">
         <!-- if required and 'touched', Angular marks form as ng-invalid and ng-dirty -->
 
         <label for="eventTime">Event Time:</label>
